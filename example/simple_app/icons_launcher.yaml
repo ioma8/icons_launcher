@@ -1,6 +1,8 @@
 # dart run icons_launcher:create
+# Supported image formats: PNG, JPEG, SVG
 
 icons_launcher:
+  # You can use SVG files as input: image_path: "assets/ic_logo_example.svg"
   platforms:
     android:
       enable: true
