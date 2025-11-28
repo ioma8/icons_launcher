@@ -60,7 +60,7 @@ class Icon {
       }
       return Icon._loadBytes(pngBytes);
     }
-    return Icon._loadBytes(File(filePath).readAsBytesSync());
+    return Icon._loadBytes(await File(filePath).readAsBytes());
   }
 
   /// Check image has an alpha channel
