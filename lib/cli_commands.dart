@@ -5,6 +5,7 @@ import 'package:yaml/yaml.dart';
 import 'utils/cli_logger.dart';
 import 'utils/constants.dart';
 import 'utils/icon.dart';
+import 'utils/svg_utils.dart';
 import 'utils/template.dart';
 import 'utils/utils.dart';
 
@@ -19,14 +20,102 @@ part 'utils/flavor_helper.dart';
 late _FlavorHelper _flavorHelper;
 
 /// Create launcher icons
-void createIconsLauncher({String? path, String? flavor}) {
+Future<void> createIconsLauncher({String? path, String? flavor}) async {
   if (flavor != null) {
     print('\n📱  Starting with $flavor flavor 🚀\n');
   }
   _flavorHelper = _FlavorHelper(flavor);
   final config = _getConfig(configFile: path);
   _checkConfig(config);
+
+  // Pre-convert SVG files before generating icons
+  await _preConvertSvgFiles(config);
+
   _createIconsByConfig(config);
+}
+
+/// Pre-convert all SVG files in the config to PNG
+Future<void> _preConvertSvgFiles(Map<String, dynamic> config) async {
+  final svgFiles = <String>[];
+
+  // Collect all image paths that might be SVG files
+  void collectImagePath(String? path) {
+    if (path != null && path.isNotEmpty && SvgUtils.isSvgFile(path)) {
+      svgFiles.add(path);
+    }
+  }
+
+  // Global image path
+  collectImagePath(config['image_path']?.toString());
+
+  // Platform-specific image paths
+  if (config.containsKey('platforms')) {
+    final platforms = config['platforms'] as Map<String, dynamic>;
+
+    // Android
+    if (platforms.containsKey('android')) {
+      final android = platforms['android'] as Map<String, dynamic>;
+      collectImagePath(android['image_path']?.toString());
+      collectImagePath(android['adaptive_background_image']?.toString());
+      collectImagePath(android['adaptive_foreground_image']?.toString());
+      collectImagePath(android['adaptive_round_image']?.toString());
+      collectImagePath(android['adaptive_monochrome_image']?.toString());
+      collectImagePath(android['notification_image']?.toString());
+    }
+
+    // iOS
+    if (platforms.containsKey('ios')) {
+      final ios = platforms['ios'] as Map<String, dynamic>;
+      collectImagePath(ios['image_path']?.toString());
+      collectImagePath(ios['dark_path']?.toString());
+      collectImagePath(ios['tinted_path']?.toString());
+    }
+
+    // macOS
+    if (platforms.containsKey('macos')) {
+      final macos = platforms['macos'] as Map<String, dynamic>;
+      collectImagePath(macos['image_path']?.toString());
+    }
+
+    // Windows
+    if (platforms.containsKey('windows')) {
+      final windows = platforms['windows'] as Map<String, dynamic>;
+      collectImagePath(windows['image_path']?.toString());
+    }
+
+    // Linux
+    if (platforms.containsKey('linux')) {
+      final linux = platforms['linux'] as Map<String, dynamic>;
+      collectImagePath(linux['image_path']?.toString());
+    }
+
+    // Web
+    if (platforms.containsKey('web')) {
+      final web = platforms['web'] as Map<String, dynamic>;
+      collectImagePath(web['image_path']?.toString());
+      collectImagePath(web['favicon_path']?.toString());
+    }
+  }
+
+  // Pre-convert unique SVG files
+  final uniqueSvgFiles = svgFiles.toSet();
+  if (uniqueSvgFiles.isNotEmpty) {
+    CliLogger.info('Converting ${uniqueSvgFiles.length} SVG file(s) to PNG...');
+    for (final svgFile in uniqueSvgFiles) {
+      final success = await SvgUtils.preConvertSvgFile(svgFile);
+      if (!success) {
+        CliLogger.error(
+          'Failed to convert SVG file: $svgFile',
+          level: CliLoggerLevel.two,
+        );
+        exit(1);
+      }
+      CliLogger.success(
+        'Converted: $svgFile',
+        level: CliLoggerLevel.two,
+      );
+    }
+  }
 }
 
 /// Get config file
@@ -456,9 +545,10 @@ String? _checkImageExists({
     final imageExtension = p.extension(image).toLowerCase();
     if (imageExtension != '.png' &&
         imageExtension != '.jpg' &&
-        imageExtension != '.jpeg') {
+        imageExtension != '.jpeg' &&
+        imageExtension != '.svg') {
       CliLogger.error(
-        'Unsupported file format: $image  Your image must be a JPG, JPEG or PNG file.',
+        'Unsupported file format: $image  Your image must be a JPG, JPEG, PNG, or SVG file.',
       );
       exit(1);
     }

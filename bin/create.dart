@@ -3,7 +3,7 @@ import 'package:icons_launcher/cli_commands.dart';
 import 'package:icons_launcher/utils/constants.dart';
 
 /// Run to create icons launcher
-void main(List<String> arguments) {
+Future<void> main(List<String> arguments) async {
   print(START_MESSAGE);
   final parser = ArgParser();
 
@@ -20,14 +20,14 @@ void main(List<String> arguments) {
   final path = parsedArgs['path'] as String?;
 
   if (parsedArgs['flavor'] != null) {
-    createIconsLauncher(path: path, flavor: parsedArgs['flavor'] as String?);
+    await createIconsLauncher(path: path, flavor: parsedArgs['flavor'] as String?);
   } else if (parsedArgs['flavors'] != null) {
     final flavors = parsedArgs['flavors'].toString().split(',');
     for (final flavor in flavors) {
-      createIconsLauncher(path: path, flavor: flavor);
+      await createIconsLauncher(path: path, flavor: flavor);
     }
   } else {
-    createIconsLauncher(path: path, flavor: null);
+    await createIconsLauncher(path: path, flavor: null);
   }
 
   print(END_MESSAGE);

@@ -96,6 +96,20 @@ icons_launcher:
 > **Note**
 > For IOS 18 icons `dark` and `tinted` also supported. See more on example config below.
 
+> **SVG Support**
+> Icons Launcher supports SVG files as input images. SVG files are automatically converted to PNG at high resolution (1024x1024) before being resized for each platform. This ensures crisp, high-quality icons at all sizes.
+>
+> Example using SVG:
+> ```yaml
+> icons_launcher:
+>   image_path: "assets/icon.svg"
+>   platforms:
+>     android:
+>       enable: true
+>     ios:
+>       enable: true
+> ```
+
 ### 2. Run the package
 
 After setting up the configuration, all that is left to do is run the package:
@@ -126,10 +140,17 @@ In the above configuration, the package is setup to replace the existing launche
 
 Shown below is the full list of attributes which you can specify within your Icons Launcher configuration.
 
-| Icons Launcher Option | Type   | Default | Description                                  |
-| --------------------- | ------ | ------- | -------------------------------------------- |
-| `image_path`          | String | `null`  | The image file path                          |
-| `platforms`           | Object | `null`  | Use for specific platforms to generate icons |
+### Supported Image Formats
+
+Icons Launcher supports the following image formats:
+- **PNG** (.png)
+- **JPEG** (.jpg, .jpeg)
+- **SVG** (.svg) - Automatically converted to PNG at 1024x1024 resolution
+
+| Icons Launcher Option | Type   | Default | Description                                            |
+| --------------------- | ------ | ------- | ------------------------------------------------------ |
+| `image_path`          | String | `null`  | The image file path (PNG, JPEG, or SVG)                |
+| `platforms`           | Object | `null`  | Use for specific platforms to generate icons           |
 
 ---
 

@@ -129,7 +129,8 @@ bool isValidHexaCode(String hexaCode) {
 bool isImageFile(String fileName) {
   return fileName.endsWith('.png') ||
       fileName.endsWith('.jpg') ||
-      fileName.endsWith('.jpeg');
+      fileName.endsWith('.jpeg') ||
+      fileName.endsWith('.svg');
 }
 
 /// Get color xml content
