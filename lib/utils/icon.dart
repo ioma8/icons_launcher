@@ -3,6 +3,8 @@ import 'dart:typed_data';
 import 'package:image/image.dart';
 import 'package:universal_io/io.dart';
 
+import 'svg_utils.dart';
+
 /// Icon template
 class IconTemplate {
   /// Constructor
@@ -29,9 +31,36 @@ class Icon {
     return Icon._(image);
   }
 
-  /// Load an image from file
+  /// Load an image from file (supports PNG, JPG, JPEG, and SVG formats)
+  ///
+  /// For SVG files, the file must be pre-converted using [SvgUtils.preConvertSvgFile]
+  /// before calling this method. The converted PNG bytes will be retrieved from cache.
   static Icon? loadFile(String filePath) {
+    // Check if it's an SVG file
+    if (SvgUtils.isSvgFile(filePath)) {
+      // Get pre-converted PNG bytes from cache
+      final pngBytes = SvgUtils.getCachedPngBytes(filePath);
+      if (pngBytes == null) {
+        throw StateError(
+          'SVG file "$filePath" must be pre-converted before loading. '
+          'Use SvgUtils.preConvertSvgFile() first.',
+        );
+      }
+      return Icon._loadBytes(pngBytes);
+    }
     return Icon._loadBytes(File(filePath).readAsBytesSync());
+  }
+
+  /// Load an image from file asynchronously (supports PNG, JPG, JPEG, and SVG formats)
+  static Future<Icon?> loadFileAsync(String filePath) async {
+    if (SvgUtils.isSvgFile(filePath)) {
+      final pngBytes = await SvgUtils.svgToPngBytes(filePath);
+      if (pngBytes == null) {
+        return null;
+      }
+      return Icon._loadBytes(pngBytes);
+    }
+    return Icon._loadBytes(await File(filePath).readAsBytes());
   }
 
   /// Check image has an alpha channel
