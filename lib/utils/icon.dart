@@ -73,27 +73,29 @@ class Icon {
     }
 
     image.backgroundColor = ColorUint8.rgb(255, 255, 255);
-    image = image.convert(
-      numChannels: 3,
-    );
+    image = image.convert(numChannels: 3);
   }
 
   /// Create a resized copy of this Icon
   Icon copyResized(int iconSize) {
     if (image.width >= iconSize) {
-      return Icon._(copyResize(
-        image,
-        width: iconSize,
-        height: iconSize,
-        interpolation: Interpolation.average,
-      ));
+      return Icon._(
+        copyResize(
+          image,
+          width: iconSize,
+          height: iconSize,
+          interpolation: .average,
+        ),
+      );
     } else {
-      return Icon._(copyResize(
-        image,
-        width: iconSize,
-        height: iconSize,
-        interpolation: Interpolation.linear,
-      ));
+      return Icon._(
+        copyResize(
+          image,
+          width: iconSize,
+          height: iconSize,
+          interpolation: .linear,
+        ),
+      );
     }
   }
 
@@ -107,9 +109,14 @@ class Icon {
 
   /// Save the resized image to a Windows ico file
   static void saveIco(List<Icon> icons, String filePath) {
-    final image = Image(width: 256, height: 256);
-    image.frames = icons.map((icon) => icon.image).toList();
-    image.frameType = FrameType.sequence;
+    if (icons.isEmpty) {
+      return;
+    }
+
+    final image = icons.first.image.clone();
+    for (var i = 1; i < icons.length; i++) {
+      image.addFrame(icons[i].image);
+    }
 
     final data = encodeIco(image);
     final file = File(filePath);

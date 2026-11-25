@@ -15,24 +15,24 @@ void main() {
     // Load SVG using pure_svg
     const loader = SvgStringLoader(testSvg);
     final pictureInfo = await vg.loadPicture(loader);
-    
+
     expect(pictureInfo.size.width, greaterThan(0));
     expect(pictureInfo.size.height, greaterThan(0));
-    
+
     // Render to image
     const targetSize = 1024;
     final image = await pictureInfo.picture.toImage(targetSize, targetSize);
-    
+
     expect(image.width, targetSize);
     expect(image.height, targetSize);
-    
+
     // Convert to PNG
     final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
     expect(byteData, isNotNull);
-    
+
     final pngBytes = byteData!.buffer.asUint8List();
     expect(pngBytes.length, greaterThan(0));
-    
+
     // Verify PNG signature
     // PNG files start with: 0x89 0x50 0x4E 0x47 0x0D 0x0A 0x1A 0x0A
     expect(pngBytes[0], 0x89);
