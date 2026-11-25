@@ -1,5 +1,6 @@
 import 'package:args/args.dart';
 import 'package:icons_launcher/cli_commands.dart';
+import 'package:icons_launcher/utils/cli_logger.dart';
 import 'package:icons_launcher/utils/constants.dart';
 
 /// Run to create icons launcher
@@ -20,7 +21,10 @@ Future<void> main(List<String> arguments) async {
   final path = parsedArgs['path'] as String?;
 
   if (parsedArgs['flavor'] != null) {
-    await createIconsLauncher(path: path, flavor: parsedArgs['flavor'] as String?);
+    await createIconsLauncher(
+      path: path,
+      flavor: parsedArgs['flavor'] as String?,
+    );
   } else if (parsedArgs['flavors'] != null) {
     final flavors = parsedArgs['flavors'].toString().split(',');
     for (final flavor in flavors) {
@@ -29,6 +33,11 @@ Future<void> main(List<String> arguments) async {
   } else {
     await createIconsLauncher(path: path, flavor: null);
   }
+
+  CliLogger.success(
+    '\n\n==> 🎉 ICONS LAUNCHER GENERATED SUCCESSFULLY 🎉 <==',
+    emoji: '',
+  );
 
   print(END_MESSAGE);
 }

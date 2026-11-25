@@ -1,7 +1,8 @@
 import 'dart:typed_data';
 
-import 'package:pure_svg/src/loaders.dart';
+// ignore: implementation_imports
 import 'package:pure_svg/src/vector_graphics/vector_graphics/vector_graphics.dart';
+import 'package:pure_svg/svg.dart';
 import 'package:pure_ui/pure_ui.dart' as ui;
 import 'package:universal_io/io.dart';
 
@@ -107,4 +108,3 @@ class SvgUtils {
     return bytes != null;
   }
 }
-

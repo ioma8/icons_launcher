@@ -1,5 +1,20 @@
 # Changelog
 
+## 3.1.0
+- Feat(web): add `maskable_image_path` support for web icons generator
+- Feat(web): add `favicon_output_extension` support for web icons generator with `.ico`, `.png` and default `.png` 
+- Feat(linux): add `snapcraft.yaml` and update `desktop` file generator
+- Refactor(macos): update macos icon generator to follow new flutter template
+- Chore(log): improve CLI output messages and formatting
+- Chore(dart): bump dart sdk min version to `v3.10.0`
+- Chore(image): bump image package from `v4.5.4` to `v4.8.0`
+- Chore(path): bump path package from `v1.8.2` to `v1.9.1`
+- Chore(universal_io): bump universal_io package from `v2.2.2` to `v2.3.1`
+- Chore(build_runner): bump build_runner package from `v2.8.0` to `v2.13.1`
+- Chore(build_version): bump build_version package from `v2.1.3` to `v2.2.0`
+- Chore(lints): bump lints package from `v6.0.0` to `v6.1.0`
+- Chore(test): bump test package from `v1.26.3` to `v1.31.0`
+
 ## 3.0.3
 - Fixed generate flavor and scale icons on macOS
 - Upgrade dependencies

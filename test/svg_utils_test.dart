@@ -25,11 +25,11 @@ void main() {
   <rect width="100" height="100" fill="#FF0000" />
 </svg>
 ''';
-      
+
       final pngBytes = await SvgUtils.svgStringToPngBytes(svgContent);
       expect(pngBytes, isNotNull);
       expect(pngBytes!.length, greaterThan(0));
-      
+
       // Verify PNG signature
       expect(pngBytes[0], 0x89);
       expect(pngBytes[1], 0x50); // 'P'
@@ -43,13 +43,19 @@ void main() {
   <rect width="100" height="100" fill="#00FF00" />
 </svg>
 ''';
-      
-      final pngBytes256 = await SvgUtils.svgStringToPngBytes(svgContent, size: 256);
-      final pngBytes512 = await SvgUtils.svgStringToPngBytes(svgContent, size: 512);
-      
+
+      final pngBytes256 = await SvgUtils.svgStringToPngBytes(
+        svgContent,
+        size: 256,
+      );
+      final pngBytes512 = await SvgUtils.svgStringToPngBytes(
+        svgContent,
+        size: 512,
+      );
+
       expect(pngBytes256, isNotNull);
       expect(pngBytes512, isNotNull);
-      
+
       // Larger images should generally have more bytes (though not always proportional)
       expect(pngBytes512!.length, greaterThan(pngBytes256!.length));
     });
@@ -60,24 +66,24 @@ void main() {
   <circle cx="25" cy="25" r="20" fill="#0000FF" />
 </svg>
 ''';
-      
+
       // Clear cache first
       SvgUtils.clearCache();
-      
+
       // Initially not cached
       expect(SvgUtils.getCachedPngBytes('test_path.svg'), isNull);
-      
+
       // Convert and cache
       final pngBytes = await SvgUtils.svgStringToPngBytes(svgContent);
       expect(pngBytes, isNotNull);
-      
+
       SvgUtils.cachePngBytes('test_path.svg', pngBytes!);
-      
+
       // Now cached
       final cachedBytes = SvgUtils.getCachedPngBytes('test_path.svg');
       expect(cachedBytes, isNotNull);
       expect(cachedBytes, equals(pngBytes));
-      
+
       // Clear cache
       SvgUtils.clearCache();
       expect(SvgUtils.getCachedPngBytes('test_path.svg'), isNull);
@@ -92,24 +98,24 @@ void main() {
       // Create a temporary SVG file
       final tempDir = Directory.systemTemp.createTempSync('svg_test_');
       final svgFile = File('${tempDir.path}/test_icon.svg');
-      
+
       const svgContent = '''
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
   <rect width="100" height="100" fill="#FFFF00" />
 </svg>
 ''';
-      
+
       await svgFile.writeAsString(svgContent);
-      
+
       try {
         // Clear cache
         SvgUtils.clearCache();
-        
+
         // Convert file
         final pngBytes = await SvgUtils.svgToPngBytes(svgFile.path);
         expect(pngBytes, isNotNull);
         expect(pngBytes!.length, greaterThan(0));
-        
+
         // Should be cached now
         final cachedBytes = SvgUtils.getCachedPngBytes(svgFile.path);
         expect(cachedBytes, isNotNull);

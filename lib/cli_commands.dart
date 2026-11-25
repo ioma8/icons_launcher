@@ -93,6 +93,7 @@ Future<void> _preConvertSvgFiles(Map<String, dynamic> config) async {
     if (platforms.containsKey('web')) {
       final web = platforms['web'] as Map<String, dynamic>;
       collectImagePath(web['image_path']?.toString());
+      collectImagePath(web['maskable_image_path']?.toString());
       collectImagePath(web['favicon_path']?.toString());
     }
   }
@@ -110,10 +111,7 @@ Future<void> _preConvertSvgFiles(Map<String, dynamic> config) async {
         );
         exit(1);
       }
-      CliLogger.success(
-        'Converted: $svgFile',
-        level: CliLoggerLevel.two,
-      );
+      CliLogger.success('Converted: $svgFile', level: CliLoggerLevel.two);
     }
   }
 }
@@ -140,7 +138,8 @@ Map<String, dynamic> _getConfig({String? configFile}) {
 
   if (yamlMap['icons_launcher'] is! Map) {
     CliLogger.error(
-        "Your $filePath file does not contain a 'icons_launcher' section.");
+      "Your $filePath file does not contain a 'icons_launcher' section.",
+    );
     exit(1);
   }
 
@@ -176,8 +175,10 @@ void _checkConfig(Map<String, dynamic> config) {
     exit(1);
   }
   final errors = <String>[];
-  final globalImagePath =
-      _checkImageExists(config: config, parameter: 'image_path');
+  final globalImagePath = _checkImageExists(
+    config: config,
+    parameter: 'image_path',
+  );
   final platforms = config['platforms'] as Map<String, dynamic>;
 
   // ANDROID
@@ -185,7 +186,7 @@ void _checkConfig(Map<String, dynamic> config) {
     final androidConfig = platforms['android'] as Map<String, dynamic>;
     final androidImagePath =
         _checkImageExists(config: androidConfig, parameter: 'image_path') ??
-            globalImagePath;
+        globalImagePath;
     if (androidImagePath == null) {
       errors.add('Please add a `image_path` for Android to your config file.');
     }
@@ -194,20 +195,24 @@ void _checkConfig(Map<String, dynamic> config) {
         !androidConfig.containsKey('adaptive_background_image') &&
         !androidConfig.containsKey('adaptive_background_color')) {
       errors.add(
-          'Please add an `adaptive_background_image` or `adaptive_background_color` for Android to your config file.');
+        'Please add an `adaptive_background_image` or `adaptive_background_color` for Android to your config file.',
+      );
     }
 
     if (!androidConfig.containsKey('adaptive_foreground_image') &&
         (androidConfig.containsKey('adaptive_background_image') ||
             androidConfig.containsKey('adaptive_background_color'))) {
       errors.add(
-          'Please add an `adaptive_foreground_image` for Android to your config file.');
+        'Please add an `adaptive_foreground_image` for Android to your config file.',
+      );
     }
 
     if (androidConfig.containsKey('adaptive_background_image') &&
         androidConfig.containsKey('adaptive_background_color')) {
-      errors.add('Your Android platform can not contain both '
-          '`adaptive_background_image` and `adaptive_background_color`.');
+      errors.add(
+        'Your Android platform can not contain both '
+        '`adaptive_background_image` and `adaptive_background_color`.',
+      );
     }
   }
 
@@ -216,7 +221,7 @@ void _checkConfig(Map<String, dynamic> config) {
     final iosConfig = platforms['ios'] as Map<String, dynamic>;
     final iosImagePath =
         _checkImageExists(config: iosConfig, parameter: 'image_path') ??
-            globalImagePath;
+        globalImagePath;
     if (iosImagePath == null) {
       errors.add('Please add a `image_path` for IOS to your config file.');
     }
@@ -227,7 +232,7 @@ void _checkConfig(Map<String, dynamic> config) {
     final macosConfig = platforms['macos'] as Map<String, dynamic>;
     final macosImagePath =
         _checkImageExists(config: macosConfig, parameter: 'image_path') ??
-            globalImagePath;
+        globalImagePath;
     if (macosImagePath == null) {
       errors.add('Please add a `image_path` for MacOS to your config file.');
     }
@@ -238,7 +243,7 @@ void _checkConfig(Map<String, dynamic> config) {
     final webConfig = platforms['web'] as Map<String, dynamic>;
     final webImagePath =
         _checkImageExists(config: webConfig, parameter: 'image_path') ??
-            globalImagePath;
+        globalImagePath;
     if (webImagePath == null) {
       errors.add('Please add a `image_path` for Web to your config file.');
     }
@@ -249,7 +254,7 @@ void _checkConfig(Map<String, dynamic> config) {
     final windowsConfig = platforms['windows'] as Map<String, dynamic>;
     final windowsImagePath =
         _checkImageExists(config: windowsConfig, parameter: 'image_path') ??
-            globalImagePath;
+        globalImagePath;
     if (windowsImagePath == null) {
       errors.add('Please add a `image_path` for Windows to your config file.');
     }
@@ -260,7 +265,7 @@ void _checkConfig(Map<String, dynamic> config) {
     final linuxConfig = platforms['linux'] as Map<String, dynamic>;
     final linuxImagePath =
         _checkImageExists(config: linuxConfig, parameter: 'image_path') ??
-            globalImagePath;
+        globalImagePath;
     if (linuxImagePath == null) {
       errors.add('Please add a `image_path` for Linux to your config file.');
     }
@@ -278,7 +283,7 @@ void _createIconsByConfig(Map<String, dynamic> config) {
   final imagePath = _checkImageExists(config: config, parameter: 'image_path');
   final platforms = config['platforms'] as Map<String, dynamic>;
 
-  var imagePathAndroid = imagePath;
+  String? imagePathAndroid = imagePath;
   if (isNeedingNewAndroidIcon(platforms)) {
     final newImagePath = _checkImageExists(
       config: platforms['android'] as Map<String, dynamic>,
@@ -293,7 +298,7 @@ void _createIconsByConfig(Map<String, dynamic> config) {
     }
   }
 
-  var imagePathIos = imagePath;
+  String? imagePathIos = imagePath;
   String? imagePathIosDark;
   String? imagePathIosTinted;
   if (isNeedingNewIosIcon(platforms)) {
@@ -320,7 +325,7 @@ void _createIconsByConfig(Map<String, dynamic> config) {
     );
   }
 
-  var imagePathMacos = imagePath;
+  String? imagePathMacos = imagePath;
   if (isNeedingNewMacOSIcon(platforms)) {
     final newImagePath = _checkImageExists(
       config: platforms['macos'] as Map<String, dynamic>,
@@ -335,7 +340,7 @@ void _createIconsByConfig(Map<String, dynamic> config) {
     }
   }
 
-  var imagePathWindows = imagePath;
+  String? imagePathWindows = imagePath;
   if (isNeedingNewWindowsIcon(platforms)) {
     final newImagePath = _checkImageExists(
       config: platforms['windows'] as Map<String, dynamic>,
@@ -350,7 +355,7 @@ void _createIconsByConfig(Map<String, dynamic> config) {
     }
   }
 
-  var imagePathLinux = imagePath;
+  String? imagePathLinux = imagePath;
   if (isNeedingNewLinuxIcon(platforms)) {
     final newImagePath = _checkImageExists(
       config: platforms['linux'] as Map<String, dynamic>,
@@ -365,7 +370,8 @@ void _createIconsByConfig(Map<String, dynamic> config) {
     }
   }
 
-  var imagePathWeb = imagePath;
+  String? imagePathWeb = imagePath;
+  String? maskableImagePathWeb;
   if (isNeedingNewWebIcon(platforms)) {
     final newImagePath = _checkImageExists(
       config: platforms['web'] as Map<String, dynamic>,
@@ -378,9 +384,18 @@ void _createIconsByConfig(Map<String, dynamic> config) {
       CliLogger.error('Could not find image path for Web');
       exit(1);
     }
+
+    final newMaskableImagePath = _checkImageExists(
+      config: platforms['web'] as Map<String, dynamic>,
+      parameter: 'maskable_image_path',
+    );
+    if (newMaskableImagePath != null) {
+      maskableImagePathWeb = newMaskableImagePath;
+    }
   }
 
-  var faviconPathWeb = imagePathWeb;
+  String? faviconPathWeb = imagePathWeb;
+  String faviconOutputExtensionWeb = '.png';
   if (isNeedingNewWebIcon(platforms)) {
     final newImagePath = _checkImageExists(
       config: platforms['web'] as Map<String, dynamic>,
@@ -388,6 +403,13 @@ void _createIconsByConfig(Map<String, dynamic> config) {
     );
     if (newImagePath != null) {
       faviconPathWeb = newImagePath;
+    }
+
+    final faviconOutputExtension =
+        (platforms['web'] as Map<String, dynamic>)['favicon_output_extension']
+            ?.toString();
+    if (faviconOutputExtension != null) {
+      faviconOutputExtensionWeb = faviconOutputExtension;
     }
   }
 
@@ -442,11 +464,13 @@ void _createIconsByConfig(Map<String, dynamic> config) {
     }
 
     String? adaptiveBg;
-    if ((platforms['android'] as Map<String, dynamic>)
-        .containsKey('adaptive_background_color')) {
-      final adaptiveBgColor = (platforms['android']
-              as Map<String, dynamic>)['adaptive_background_color']
-          .toString();
+    if ((platforms['android'] as Map<String, dynamic>).containsKey(
+      'adaptive_background_color',
+    )) {
+      final adaptiveBgColor =
+          (platforms['android']
+                  as Map<String, dynamic>)['adaptive_background_color']
+              .toString();
       adaptiveBg = adaptiveBgColor;
     } else if (adaptiveBgImage != null) {
       adaptiveBg = adaptiveBgImage;
@@ -458,14 +482,16 @@ void _createIconsByConfig(Map<String, dynamic> config) {
       final minSdk = _minSdk();
       if (minSdk == 0) {
         CliLogger.error(
-            'Can not find minSdk from android/app/build.gradle or android/local.properties',
-            level: CliLoggerLevel.two);
+          'Can not find minSdk from android/app/build.gradle or android/local.properties',
+          level: .two,
+        );
         exit(1);
       }
       if (minSdk < 26 && imagePathAndroid == null) {
         CliLogger.error(
-            'Adaptive icon config found but no regular Android config. API 26 the regular Android config is required',
-            level: CliLoggerLevel.two);
+          'Adaptive icon config found but no regular Android config. API 26 the regular Android config is required',
+          level: .two,
+        );
         exit(1);
       }
 
@@ -510,10 +536,16 @@ void _createIconsByConfig(Map<String, dynamic> config) {
   //! Web
   if (isNeedingNewWebIcon(platforms)) {
     if (imagePathWeb != null) {
-      createWebIcons(imagePath: imagePathWeb);
+      createWebIcons(
+        imagePath: imagePathWeb,
+        maskableImagePath: maskableImagePathWeb,
+      );
     }
     if (faviconPathWeb != null) {
-      createWebFavicon(imagePath: faviconPathWeb);
+      createWebFavicon(
+        imagePath: faviconPathWeb,
+        faviconOutputExtension: faviconOutputExtensionWeb,
+      );
     }
   }
 
